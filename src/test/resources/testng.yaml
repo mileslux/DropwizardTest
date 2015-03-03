@@ -1,0 +1,12 @@
+name: dropwizardTest
+port: 8100
+threadCount: 1
+tests:
+  - name: SimpleTest
+    classes:
+      - com.infra.dropwizard.SimpleTest
+
+  - name: SecondTest
+    parameters: { message: "U wot m8?" }
+    classes:
+      - com.infra.dropwizard.SecondTest
