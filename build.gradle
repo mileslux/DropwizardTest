@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'application'
+apply plugin: 'findbugs'
 
 version = '1.0'
 
@@ -27,8 +28,14 @@ test {
     useTestNG() {
         println(properties.toMapString())
         suites("src/test/resources/testng.yaml")
-        includeGroups("second-test")
+        includeGroups("simple-test")
         println(properties.toMapString())
     }
 }
 
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}

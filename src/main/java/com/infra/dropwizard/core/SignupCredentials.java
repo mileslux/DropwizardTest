@@ -21,6 +21,8 @@ public class SignupCredentials {
 
     @NotNull
     private String username;
+
+    @NotNull
     private String password;
 
     public String getUsername() {

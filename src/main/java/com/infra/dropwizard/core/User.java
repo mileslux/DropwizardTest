@@ -3,7 +3,7 @@ package com.infra.dropwizard.core;
 import com.fluentinterface.builder.Builder;
 import com.fluentinterface.ReflectionBuilder;
 
-import java.util.Objects;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by mileslux on 2/24/15.
@@ -20,8 +20,13 @@ public class User {
         public UserBuilder withId(Long id);
     }
 
+    @NotNull
     private Long id;
+
+    @NotNull
     private String username;
+
+    @NotNull
     private String password;
 
     public Long getId() {
@@ -49,12 +54,24 @@ public class User {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == null) return false;
-        if (other.getClass() != User.class) return false;
-        final User otherUser = (User)other;
-        return otherUser.getUsername().equals(username) &&
-                otherUser.getPassword().equals(password) &&
-                id == otherUser.getId();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        if (!id.equals(user.id)) return false;
+        if (!password.equals(user.password)) return false;
+        if (!username.equals(user.username)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + username.hashCode();
+        result = 31 * result + password.hashCode();
+        return result;
     }
 }

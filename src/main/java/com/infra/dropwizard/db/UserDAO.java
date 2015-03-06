@@ -14,9 +14,7 @@ public class UserDAO {
     private final Map<Long, User> userTable = new HashMap<Long, User>();
     private long userCounter = 0;
 
-    public Optional<User> createUserByUsernameAndPassword(final String username, final String password) {
-        Optional<User> existingUser = findUserByUsernameAndPassword(username, password);
-        if (existingUser.isPresent()) return Optional.absent();
+    public Optional<User> createUserByUsernameAndPassword(String username, String password) {
         User newUser = User.create()
                 .withId(userCounter)
                 .withUsername(username)
@@ -27,7 +25,17 @@ public class UserDAO {
         return Optional.of(newUser);
     }
 
-    public Optional<User> findUserByUsernameAndPassword(final String username, final String password) {
+    public Optional<User> findUserByUsername(String username) {
+        for (Map.Entry<Long, User> entry : userTable.entrySet()) {
+            User user = entry.getValue();
+            if (user.getUsername().equals(username)) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.absent();
+    }
+
+    public Optional<User> findUserByUsernameAndPassword(String username, String password) {
         for (Map.Entry<Long, User> entry : userTable.entrySet()) {
             User user = entry.getValue();
             if (user.getPassword().equals(password) && user.getUsername().equals(username)) {
@@ -37,10 +45,10 @@ public class UserDAO {
         return Optional.absent();
     }
 
-    public boolean deleteUserByUsernameAndPassword(final String username, final String password) {
+    /*public boolean deleteUserByUsernameAndPassword(String username, String password) {
         Optional<User> existingUser = findUserByUsernameAndPassword(username, password);
         if (!existingUser.isPresent()) return false;
         userTable.remove(existingUser.get().getId());
         return true;
-    }
+    }*/
 }

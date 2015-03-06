@@ -1,5 +1,5 @@
 name: dropwizardTest
-port: 8100
+parameters: { port: 8100 }
 threadCount: 1
 tests:
   - name: SimpleTest

@@ -2,7 +2,6 @@ package com.infra.dropwizard;
 
 import com.infra.dropwizard.auth.BasicAuthenticator;
 import com.infra.dropwizard.auth.OAuth2Authenticator;
-import com.infra.dropwizard.core.User;
 import com.infra.dropwizard.db.AccessTokenDAO;
 import com.infra.dropwizard.db.UserDAO;
 import com.infra.dropwizard.resources.OAuth2Resource;
@@ -42,7 +41,7 @@ public class TestProjectApplication extends Application<TestProjectConfiguration
         final AccessTokenDAO accessTokenDAO = new AccessTokenDAO();
 
         final UserResource userResource = new UserResource(userDao);
-        final OAuth2Resource oAuth2Resource = new OAuth2Resource(accessTokenDAO, userDao);
+        final OAuth2Resource oAuth2Resource = new OAuth2Resource(accessTokenDAO);
         final SecuredResource securedResource = new SecuredResource();
 
         final TemplateHealthCheck healthCheck =
@@ -54,7 +53,7 @@ public class TestProjectApplication extends Application<TestProjectConfiguration
         environment.jersey().register(oAuth2Resource);
         environment.jersey().register(securedResource);
 
-        ChainedAuthFactory<Long> chainedAuthFactory = new ChainedAuthFactory<Long>(
+        final ChainedAuthFactory<Long> chainedAuthFactory = new ChainedAuthFactory<Long>(
                 new BasicAuthFactory<Long>(new BasicAuthenticator(userDao), "REALM", Long.class),
                 new OAuthFactory<Long>(new OAuth2Authenticator(accessTokenDAO), "REALM", Long.class)
         );

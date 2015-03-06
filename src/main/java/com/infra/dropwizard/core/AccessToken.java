@@ -29,6 +29,7 @@ public class AccessToken {
     private UUID accessTokenId;
 
     @JsonProperty("user_id")
+
     @NotNull
     private Long userId;
 
@@ -58,5 +59,27 @@ public class AccessToken {
 
     public void setLastAccessUTC(DateTime lastAccessUTC) {
         this.lastAccessUTC = lastAccessUTC;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AccessToken that = (AccessToken) o;
+
+        if (!accessTokenId.equals(that.accessTokenId)) return false;
+        if (!lastAccessUTC.equals(that.lastAccessUTC)) return false;
+        if (!userId.equals(that.userId)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = accessTokenId.hashCode();
+        result = 31 * result + userId.hashCode();
+        result = 31 * result + lastAccessUTC.hashCode();
+        return result;
     }
 }

@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import com.infra.dropwizard.core.SignupCredentials;
 import com.infra.dropwizard.core.User;
 import com.infra.dropwizard.db.UserDAO;
-import io.dropwizard.auth.Auth;
+import com.infra.dropwizard.exception.FormattedExceptionThrower;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -24,11 +24,12 @@ public class UserResource {
 
     @POST
     public Response post(SignupCredentials user) {
-        Optional<User> newUser = userDao.createUserByUsernameAndPassword(user.getUsername(), user.getPassword());
-        if (!newUser.isPresent()) {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\":\"" + "User with the specified login already exists" + "\"}").build());
+        Optional<User> existingUser = userDao.findUserByUsername(user.getUsername());
+        if (existingUser.isPresent()) {
+            FormattedExceptionThrower.throwWebApplicationException(Response.Status.CONFLICT, "User with the specified login already exists");
         }
+
+        userDao.createUserByUsernameAndPassword(user.getUsername(), user.getPassword());
 
         return Response.status(Response.Status.CREATED).build();
     }

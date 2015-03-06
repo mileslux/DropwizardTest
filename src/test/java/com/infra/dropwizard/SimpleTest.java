@@ -1,27 +1,22 @@
 package com.infra.dropwizard;
 
 import com.infra.dropwizard.core.SignupCredentials;
-import com.infra.dropwizard.core.User;
 import com.infra.dropwizard.utils.ClientRequestLoggingFilter;
 import com.infra.dropwizard.utils.ClientResponseLoggingFilter;
-import io.dropwizard.Configuration;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
-import static io.dropwizard.testing.ResourceHelpers.resourceFilePath;
+
 /**
  * Created by mileslux on 2/24/15.
  */
-
-
 @Test(groups= "simple-test")
 public class SimpleTest {
 
@@ -42,8 +37,8 @@ public class SimpleTest {
     @BeforeMethod
     public void beforeMethod() {
         client = ClientBuilder.newClient();
-        client.register(new ClientRequestLoggingFilter());
-        client.register(new ClientResponseLoggingFilter());
+        client.register(clientRequestLoggingFilter);
+        client.register(clientResponseLoggingFilter);
     }
 
     @AfterMethod
@@ -75,7 +70,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void secureGetResourceWithoutTokenReturns401() {
+    public void authGetSecuredResourceWithoutTokenReturns401() {
         Response response = client
                 .target(SECURED_PATH)
                 .request(MediaType.APPLICATION_JSON)
@@ -85,7 +80,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void ShouldSignupNewUser() {
+    public void authSignupNewUserAndAccessSecuredResource() {
 
         SignupCredentials signupCredentials = SignupCredentials.create()
                 .withUsername(username)
@@ -96,7 +91,10 @@ public class SimpleTest {
                 .target(USERS_PATH)
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.entity(signupCredentials, MediaType.APPLICATION_JSON));
-        //Assert.assertEquals(signupResponse.getStatus(), Response.Status.CREATED.getStatusCode());
+
+        int status = signupResponse.getStatus();
+        Assert.assertTrue(status == Response.Status.CREATED.getStatusCode() ||
+                status == Response.Status.CONFLICT.getStatusCode());
 
         HttpAuthenticationFeature httpAuthenticationFeature =
                 HttpAuthenticationFeature.basic(username, password);
@@ -120,5 +118,6 @@ public class SimpleTest {
         Assert.assertEquals(getAuthResourceResponse.getStatus(), Response.Status.OK.getStatusCode());
 
         String secretText = getAuthResourceResponse.readEntity(String.class);
+        Assert.assertTrue(secretText.contains("Authenticated woof"));
     }
 }
